@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  ms-order:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-order:5432/ms-order
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_JPA_SHOW_SQL=true
+      - BROKER_QUEUE_PROCESSING_NAME=exchange.processing
+      - SPRING_RABBITMQ_ADDRESSES=
+    depends_on:
+      - db-order
+
+  db-order:
+    image: postgres:13
+    container_name: db-order-postgres
+    environment:
+      POSTGRES_DB: ms-order
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
